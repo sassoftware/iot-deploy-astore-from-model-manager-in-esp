@@ -1,0 +1,100 @@
+<project name="TurboFan_MS" threads="1" pubsub="auto" heartbeat-interval="1">
+  <metadata>
+    <meta id="studioUploadedBy">demo</meta>
+    <meta id="studioUploaded">1611616858554</meta>
+    <meta id="studioModifiedBy">demo</meta>
+    <meta id="studioModified">1611678765497</meta>
+    <meta id="layout">{"cq1":{"Filter_Alerts":{"x":-125,"y":75},"Score_ASTORE":{"x":-125,"y":-65},"turbofan_data":{"x":-125,"y":-200}}}</meta>
+    <meta id="mm_linked_module1">31129b95-8eb5-436d-9c49-faffb2bba719,558da8d9-5573-4c6d-88d5-c44fd8316ae5,ds2MultiType,TurboFan_AnomalyDetection,ScoreSVDD (Pipeline 1),2</meta>
+    <meta id="mm_astore_module1_0">_1S83T7N3QYVKF1Q0LBFDV320X9,file:///models/astores/viya/_1S83T7N3QYVKF1Q0LBFDV320X9.astore</meta>
+    <meta id="studioTags">MM, ASTORE, ModelStudio</meta>
+  </metadata>
+  <mas-modules>
+    <mas-module module="module1" language="ds2" func-names="init,_BMMB99E46Q06O46ZOKS8DFX85,_9UOZTIDFBFBPEVODW4EICBNOS,post_9UOZTIDFBFBPEVODW4EICBNOS,score,predictedscore" mas-store="31129b95-8eb5-436d-9c49-faffb2bba719_champion_c5100c3b-1efd-4208-9041-df86421c204d" mas-store-version="0.1">
+      <description><![CDATA[Project: TurboFan_AnomalyDetection; model: ScoreSVDD (Pipeline 1); version: 2]]></description>
+      <code-file><![CDATA[dmcas_packagescorecode.sas]]></code-file>
+      <module-members>
+        <module-member member="astore_0" type="astore" SHAkey="1BC1B62AB92829BB6CDC83209F7F8FD8FD571B16">
+          <code-file><![CDATA[_1S83T7N3QYVKF1Q0LBFDV320X9]]></code-file>
+        </module-member>
+      </module-members>
+    </mas-module>
+  </mas-modules>
+  <contqueries>
+    <contquery name="cq1">
+      <windows>
+        <window-source pubsub="true" insert-only="true" autogen-key="true" index="pi_EMPTY" name="turbofan_data">
+          <schema>
+            <fields>
+              <field name="Event_ID" type="string" key="true"/>
+              <field name="Engine_ID" type="string"/>
+              <field name="DATETIME" type="string"/>
+              <field name="NORMAL_N" type="double"/>
+              <field name="Oper_Set_1" type="double"/>
+              <field name="Oper_Set_2" type="double"/>
+              <field name="Oper_Set_3" type="double"/>
+              <field name="Fan_Inlet_Temp" type="double"/>
+              <field name="LPC_Outlet_Temp" type="double"/>
+              <field name="HPC_Outlet_Temp" type="double"/>
+              <field name="LPT_Outlet_Temp" type="double"/>
+              <field name="Fan_Inlet_Pressure" type="double"/>
+              <field name="Bypass_Duct_Pressure" type="double"/>
+              <field name="Total_HPC_Outlet_Pressure" type="double"/>
+              <field name="Physical_Fan_Speed" type="double"/>
+              <field name="Physical_Core_Speed" type="double"/>
+              <field name="Engine_Pressure_Ratio" type="double"/>
+              <field name="Static_HPC_Outlet_Pressure" type="double"/>
+              <field name="Fuel_Flow_Ratio" type="double"/>
+              <field name="Corrected_Fan_Speed" type="double"/>
+              <field name="Corrected_Core_Speed" type="double"/>
+              <field name="Bypass_Ratio" type="double"/>
+              <field name="Burner_Fuel_Air_Ratio" type="double"/>
+              <field name="Bleed_Enthalpy" type="double"/>
+              <field name="Demanded_Fan_Speed" type="double"/>
+              <field name="Demanded_Crrct_Fan_Speed" type="double"/>
+              <field name="HPT_Coolant_Bleed" type="double"/>
+              <field name="LPT_Coolant_Bleed" type="double"/>
+            </fields>
+          </schema>
+          <connectors>
+            <connector class="fs" name="pub">
+              <properties>
+                <property name="type"><![CDATA[pub]]></property>
+                <property name="dateformat"><![CDATA[%d%b%Y:%k:%M:%S]]></property>
+                <property name="header"><![CDATA[1]]></property>
+                <property name="noautogenfield"><![CDATA[true]]></property>
+                <property name="addcsvopcode"><![CDATA[true]]></property>
+                <property name="addcsvflags"><![CDATA[normal]]></property>
+                <property name="fsname"><![CDATA[/mnt/viya-share/esp/turbofan_200eng_ind.csv]]></property>
+                <property name="fstype"><![CDATA[csv]]></property>
+              </properties>
+            </connector>
+          </connectors>
+        </window-source>
+        <window-calculate name="Score_ASTORE" algorithm="MAS">
+          <schema>
+            <fields>
+              <field name="Event_ID" type="string" key="true"/>
+              <field name="Engine_ID" type="string"/>
+              <field name="DATETIME" type="string"/>
+              <field name="_SVDDDISTANCE_" type="double"/>
+              <field name="_SVDDSCORE_" type="double"/>
+              <field name="P_NORMAL" type="double"/>
+              <field name="EM_PREDICTION" type="double"/>
+            </fields>
+          </schema>
+          <mas-map>
+            <window-map module="module1" function="score" revision="0" source="turbofan_data"/>
+          </mas-map>
+        </window-calculate>
+        <window-filter pubsub="true" name="Filter_Alerts">
+          <expression><![CDATA[_SVDDSCORE_ >=1]]></expression>
+        </window-filter>
+      </windows>
+      <edges>
+        <edge source="turbofan_data" target="Score_ASTORE" role="data"/>
+        <edge source="Score_ASTORE" target="Filter_Alerts"/>
+      </edges>
+    </contquery>
+  </contqueries>
+</project>
